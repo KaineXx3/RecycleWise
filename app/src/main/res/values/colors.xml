@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="backcolor">#EFF4F7</color>
+    <color name="grey">#A0A0A0</color>
+    <color name="forgotpasswordcolor">#3F51B5</color>
+    <color name="buttoncolor">#3F51B5</color>
+
+
+    <color name="status_pending">#FFF9C4</color>
+    <color name="status_approved">#C8E6C9</color>
+    <color name="status_completed">#BBDEFB</color>
+    <color name="status_rejected">#FFCDD2</color>
+    <color name="button_tint">#B39DDB</color>
+
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="Normalsize">20dp</dimen>
+    <dimen name="Titlesize">25dp</dimen>
+    <dimen name="widthIcon">45dp</dimen>
+    <dimen name="Smallsize">18dp</dimen>
+    <item name="linespacing" type="dimen" format="float">1.1</item>
+
+
+</resources>

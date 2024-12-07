@@ -1,0 +1,175 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_login"
+    android:id="@+id/rootLayout"
+    android:fitsSystemWindows="true"
+    android:padding="16dp">
+
+    <!-- Title and Description Layout -->
+    <LinearLayout
+        android:id="@+id/titleDescriptionLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentTop="true">
+
+        <TextView
+            android:id="@+id/MangeUserTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Manage User"
+            android:textSize="25sp" />
+
+        <TextView
+            android:id="@+id/MangeUserDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Manage User account here"
+            android:textSize="15sp"
+            android:textColor="@color/grey" />
+    </LinearLayout>
+
+    <!-- Header Layout -->
+    <LinearLayout
+        android:background="@drawable/item_border_mage_user_title"
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp"
+        android:gravity="center_vertical"
+        android:layout_below="@id/titleDescriptionLayout"
+        android:layout_marginTop="16dp">
+
+        <!-- Name Header with Arrows -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/nameHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Name"
+                android:layout_marginLeft="60dp"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="4dp">
+
+                <ImageView
+                    android:id="@+id/nameUpArrow"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/baseline_keyboard_arrow_up_24"
+                    android:layout_gravity="center" />
+
+                <ImageView
+                    android:id="@+id/nameDownArrow"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/baseline_keyboard_arrow_down_24"
+                    android:layout_gravity="center" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Role Header with Arrows -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginLeft="60dp"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/roleHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Role"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="4dp">
+
+            <ImageView
+                android:id="@+id/roleUpArrow"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/baseline_keyboard_arrow_up_24"
+                android:layout_gravity="center" />
+
+            <ImageView
+                android:id="@+id/roleDownArrow"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/baseline_keyboard_arrow_down_24"
+                android:layout_gravity="center"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Last Active Header with Arrows -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginLeft="10dp"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/lastActiveHeader"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:text="Last Active"
+        android:textColor="#000000"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:maxLines="2"
+        android:singleLine="false"
+        android:ellipsize="end" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="4dp">
+
+        <ImageView
+            android:id="@+id/lastActiveUpArrow"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/baseline_keyboard_arrow_up_24"
+            android:layout_gravity="center" />
+
+        <ImageView
+            android:id="@+id/lastActiveDownArrow"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/baseline_keyboard_arrow_down_24"
+            android:layout_gravity="center" />
+    </LinearLayout>
+</LinearLayout>
+    </LinearLayout>
+
+    <!-- RecyclerView -->
+<androidx.recyclerview.widget.RecyclerView
+android:id="@+id/recyclerView"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:layout_below="@id/headerLayout"
+android:scrollbars="vertical" />
+
+    </RelativeLayout>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/topAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorSurface"
+            app:navigationIcon="@drawable/baseline_close_24_black"
+            app:title="Report an Issue"
+            app:titleCentered="true"
+            app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/optionsCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutline"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <RadioGroup
+                    android:id="@+id/reportOptions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:orientation="vertical">
+
+                    <RadioButton
+                        android:id="@+id/option_not_identified"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Object exists but wasn't detected"
+                        android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                        android:paddingVertical="8dp"/>
+
+                    <RadioButton
+                        android:id="@+id/option_incorrectly_identified"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Object detected but incorrectly labeled"
+                        android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                        android:paddingVertical="8dp"/>
+
+                    <RadioButton
+                        android:id="@+id/option_non_existent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Detected object doesn't exist"
+                        android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                        android:paddingVertical="8dp"/>
+
+                    <RadioButton
+                        android:id="@+id/option_other"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Other issue"
+                        android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                        android:paddingVertical="8dp"/>
+
+                </RadioGroup>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/descriptionInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:hint="Description"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                app:layout_constraintTop_toBottomOf="@id/optionsCard">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/descriptionInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minLines="4"
+                    android:gravity="top|start"
+                    android:inputType="textMultiLine"
+                    android:maxLength="200" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/sendButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Submit"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                style="@style/Widget.MaterialComponents.Button"
+                android:backgroundTint="@color/buttoncolor"
+                android:fontFamily="sans-serif-medium"
+                android:padding="16dp"
+                android:enabled="false"
+                app:layout_constraintTop_toBottomOf="@id/descriptionInputLayout"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

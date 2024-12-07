@@ -1,0 +1,25 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/home"
+        android:icon="@drawable/baseline_home_24"
+        android:title="Home"/>
+    <item
+        android:id="@+id/imageButtonPickup"
+        android:icon="@drawable/pickup"
+        android:title="Pickup" />
+
+
+    <item
+        android:id="@+id/imageButtonCamera"
+        android:icon="@drawable/discover"
+        android:title="Discover" />
+    <item
+        android:id="@+id/imageButtonRecycleLocation"
+        android:icon="@drawable/recycle_location"
+        android:title="Location" />
+    <item
+        android:id="@+id/imageButtonProfile"
+        android:icon="@drawable/profileicon"
+        android:title="Profile" />
+
+</menu>

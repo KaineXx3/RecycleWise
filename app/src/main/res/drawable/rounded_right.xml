@@ -1,0 +1,8 @@
+<!-- rounded_right.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <corners
+        android:topRightRadius="12dp"
+        android:bottomRightRadius="12dp" />
+    <solid android:color="@color/status_rejected"/>
+</shape>
