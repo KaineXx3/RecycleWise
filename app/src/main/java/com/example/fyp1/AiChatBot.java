@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
@@ -29,19 +30,20 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import www.sanju.motiontoast.MotionToast;
 import www.sanju.motiontoast.MotionToastStyle;
+
 
 public class AiChatBot extends AppCompatActivity {
     private EditText editText;
     private RecyclerView recyclerView;
     private ChatMessageAdapter adapter;
     private ArrayList<ChatMessage> chatMessages = new ArrayList<>();
-    private String stringAPIKey = "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"; // Ensure this API key is valid
-    private String stringURLEndPoint = "https://api-inference.huggingface.co/models/microsoft/Phi-3-mini-4k-instruct/v1/chat/completions";
-    ;
+    private String stringAPIKey = "N2UzOWNjMWQtZTI5YS00NDBkLTkxY2ItY2ZlYWNhMGUwZGVkYjlhZjg2ZmQtZmY0_P0A1_caac8e9f-ddc7-4e4f-ab82-d031172a892e"; // Ensure this API key is valid
+    private String stringURLEndPoint = "https://nzltcf.buildship.run/Recycle-Wise-Chatbot";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,21 +86,15 @@ public class AiChatBot extends AppCompatActivity {
         // Clear the input field
         editText.setText("");
 
+        // Prepare JSON object for API request
         JSONObject jsonObject = new JSONObject();
-        JSONArray jsonObjectMessageArray = new JSONArray();
         try {
-            JSONObject jsonObjectMessage = new JSONObject();
-            jsonObjectMessage.put("role", "user");
-            jsonObjectMessage.put("content", stringInputText);
-            jsonObjectMessageArray.put(jsonObjectMessage);
-
-            jsonObject.put("messages", jsonObjectMessageArray);
-            jsonObject.put("model", "microsoft/Phi-3-mini-4k-instruct");
-            jsonObject.put("max_tokens", 500);
+            jsonObject.put("message", stringInputText); // Update to match the cURL format
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
 
+        // Create JSON request
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
                 stringURLEndPoint,
                 jsonObject,
@@ -106,19 +102,32 @@ public class AiChatBot extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            String stringOutput = response.getJSONArray("choices")
-                                    .getJSONObject(0)
-                                    .getJSONObject("message")
-                                    .getString("content");
+                            // Log the entire response to inspect its structure
+                            Log.d("AI Response", response.toString());
 
-                            // Add AI's message to the chat
-                            chatMessages.add(new ChatMessage(stringOutput, false));
+                            // Get the first (and only) key in the response object, which is the UUID
+                            Iterator<String> keys = response.keys();
+                            if (keys.hasNext()) {
+                                String key = keys.next();
+                                String stringOutput = response.getString(key);  // Get the recycling tip message
+                                chatMessages.add(new ChatMessage(stringOutput, false));
+                                adapter.notifyItemInserted(chatMessages.size() - 1);
+                                recyclerView.scrollToPosition(chatMessages.size() - 1);
+                            } else {
+                                // Handle case where no keys are found
+                                chatMessages.add(new ChatMessage("No response found", false));
+                                adapter.notifyItemInserted(chatMessages.size() - 1);
+                                recyclerView.scrollToPosition(chatMessages.size() - 1);
+                            }
+                        } catch (JSONException e) {
+                            Log.e("JSON Error", "Error parsing response: " + e.getMessage());
+                            chatMessages.add(new ChatMessage("Error parsing the response", false));
                             adapter.notifyItemInserted(chatMessages.size() - 1);
                             recyclerView.scrollToPosition(chatMessages.size() - 1);
-                        } catch (JSONException e) {
-                            throw new RuntimeException(e);
                         }
                     }
+
+
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
@@ -131,13 +140,7 @@ public class AiChatBot extends AppCompatActivity {
                 Log.e("VolleyError", errorMessage);
 
                 if (!isNetworkAvailable()) {
-                    MotionToast.Companion.darkToast(AiChatBot.this,
-                            "No Internet Connection",
-                            "Please check your internet settings.",
-                            MotionToastStyle.WARNING,
-                            MotionToast.GRAVITY_BOTTOM,
-                            MotionToast.LONG_DURATION,
-                            ResourcesCompat.getFont(AiChatBot.this, www.sanju.motiontoast.R.font.helveticabold));
+                    Toast.makeText(AiChatBot.this, "No network connectivity. Please check your connection.", Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -149,7 +152,7 @@ public class AiChatBot extends AppCompatActivity {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> mapHeader = new HashMap<>();
-                mapHeader.put("Content-Type", "application/json");
+                mapHeader.put("Content-Type", "application/json; charset=utf-8");
                 mapHeader.put("Authorization", "Bearer " + stringAPIKey);
                 return mapHeader;
             }
