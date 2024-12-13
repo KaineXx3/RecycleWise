@@ -209,7 +209,7 @@ public class ObjectDetection extends AppCompatActivity {
     }
 
     private void performObjectDetection(Bitmap resizedBitmap) {
-        String API_ENDPOINT = "https://nzltcf.buildship.run/file-upload-pls-la";
+        String API_ENDPOINT = "https://nzltcf.buildship.run/Object-Detection-Recycle-Wise";
 
         // Convert bitmap to file
         File imageFile = bitmapToFile(resizedBitmap);

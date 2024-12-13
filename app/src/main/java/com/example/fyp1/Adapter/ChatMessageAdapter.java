@@ -39,7 +39,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
             holder.messageTextView.setBackgroundResource(R.drawable.bg_message_user);
             holder.itemView.setLayoutDirection(View.LAYOUT_DIRECTION_RTL); // User messages on the right
         } else {
-            holder.profileImageView.setImageResource(R.drawable.recycle_wise_transparent); // Set AI profile picture
+            holder.profileImageView.setImageResource(R.drawable.logo_trans); // Set AI profile picture
             holder.messageTextView.setBackgroundResource(R.drawable.bg_message_ai);
             holder.itemView.setLayoutDirection(View.LAYOUT_DIRECTION_LTR); // AI messages on the left
         }
