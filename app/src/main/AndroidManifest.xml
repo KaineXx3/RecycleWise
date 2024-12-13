@@ -94,6 +94,7 @@
         <activity android:name=".RealtimeObjectDetection"/>
         <activity android:name=".EditNews"/>
         <activity android:name=".Feedback"/>
+        <activity android:name=".Electronic"/>
 
 
         <provider

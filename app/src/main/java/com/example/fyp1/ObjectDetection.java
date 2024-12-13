@@ -48,6 +48,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -168,7 +169,7 @@ public class ObjectDetection extends AppCompatActivity {
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
+                ".png",         /* suffix */
                 storageDir      /* directory */
         );
         currentPhotoPath = image.getAbsolutePath();
@@ -208,28 +209,42 @@ public class ObjectDetection extends AppCompatActivity {
     }
 
     private void performObjectDetection(Bitmap resizedBitmap) {
-        String API_KEY = "reyezr8XkYIZ34AUHO6p"; // Your API Key
-        String MODEL_ENDPOINT = "recycleitem/4"; // Model endpoint
+        String API_ENDPOINT = "https://nzltcf.buildship.run/file-upload-pls-la";
 
-        String base64Image = encodeImage(resizedBitmap);
-        String uploadURL = "https://detect.roboflow.com/" + MODEL_ENDPOINT + "?api_key=" + API_KEY;
+        // Convert bitmap to file
+        File imageFile = bitmapToFile(resizedBitmap);
 
-        OkHttpClient client = new OkHttpClient();
-        RequestBody requestBody = RequestBody.create(base64Image, MediaType.parse("application/x-www-form-urlencoded"));
+        if (imageFile == null) {
+            MotionToast.Companion.darkToast(ObjectDetection.this,
+                    "Error",
+                    "Failed to create image file",
+                    MotionToastStyle.ERROR,
+                    MotionToast.GRAVITY_BOTTOM,
+                    MotionToast.LONG_DURATION,
+                    ResourcesCompat.getFont(ObjectDetection.this, www.sanju.motiontoast.R.font.helveticabold));
+            return;
+        }
+
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+
+        RequestBody body = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("Image", imageFile.getName(),
+                        RequestBody.create(MediaType.parse("application/octet-stream"), imageFile))
+                .build();
+
         Request request = new Request.Builder()
-                .url(uploadURL)
-                .post(requestBody)
+                .url(API_ENDPOINT)
+                .method("POST", body)
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
-                progressBar.setVisibility(View.GONE); // Hide the ProgressBar
-                scanningText.setVisibility(View.GONE);
-
                 runOnUiThread(() -> {
-                    progressBar.setVisibility(View.GONE); // Hide the ProgressBar
+                    progressBar.setVisibility(View.GONE);
                     scanningText.setVisibility(View.GONE);
                     MotionToast.Companion.darkToast(ObjectDetection.this,
                             "Error",
@@ -247,16 +262,12 @@ public class ObjectDetection extends AppCompatActivity {
                     final String responseData = response.body().string();
                     runOnUiThread(() -> {
                         drawBoundingBox(responseData, resizedBitmap);
-                        progressBar.setVisibility(View.GONE); // Hide the ProgressBar
+                        progressBar.setVisibility(View.GONE);
                         scanningText.setVisibility(View.GONE);
                     });
-
                 } else {
-                    progressBar.setVisibility(View.GONE); // Hide the ProgressBar
-                    scanningText.setVisibility(View.GONE);
-
                     runOnUiThread(() -> {
-                        progressBar.setVisibility(View.GONE); // Hide the ProgressBar
+                        progressBar.setVisibility(View.GONE);
                         scanningText.setVisibility(View.GONE);
                         resultTextView.setText("Error: " + response.code());
                     });
@@ -265,10 +276,33 @@ public class ObjectDetection extends AppCompatActivity {
         });
     }
 
+    // Helper method to convert Bitmap to File
+    private File bitmapToFile(Bitmap bitmap) {
+        try {
+            // Create a file to save the bitmap
+            File file = createImageFile();
+
+            // Create a file output stream
+            java.io.FileOutputStream fos = new java.io.FileOutputStream(file);
+
+            // Compress the bitmap and write to the output stream
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+
+            // Flush and close the output stream
+            fos.flush();
+            fos.close();
+
+            return file;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     private void drawBoundingBox(String responseData, Bitmap bitmap) {
         try {
             JSONObject jsonObject = new JSONObject(responseData);
-            JSONArray predictions = jsonObject.getJSONArray("predictions");
+            JSONArray predictions = jsonObject.getJSONObject("value").getJSONObject("value").getJSONArray("predictions");
 
             Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
             Canvas canvas = new Canvas(mutableBitmap);
@@ -297,10 +331,11 @@ public class ObjectDetection extends AppCompatActivity {
                 String detectedClass = prediction.getString("class");
                 float confidence = (float) prediction.getDouble("confidence") * 100;
 
-                float left = x - width / 2;
-                float top = y - height / 2;
-                float right = x + width / 2;
-                float bottom = y + height / 2;
+                // Assuming `x`, `y`, `width`, and `height` are normalized (0 to 1)
+                float left = (x - width / 2) * bitmap.getWidth();
+                float top = (y - height / 2) * bitmap.getHeight();
+                float right = (x + width / 2) * bitmap.getWidth();
+                float bottom = (y + height / 2) * bitmap.getHeight();
 
                 int boxColor = getColorForClass(detectedClass);
                 boxPaint.setColor(boxColor);
@@ -324,22 +359,28 @@ public class ObjectDetection extends AppCompatActivity {
 
         } catch (Exception e) {
             e.printStackTrace();
-            resultTextView.setText("Error parsing response");
+            resultTextView.setText("Error parsing response: " + e.getMessage());
+        }
+    }
+    // ["", "glass", ", "", "", "", "carton", "mouse", "television", "laptop", "keyboard"];
+    private int getColorForClass(String detectedClass) {
+        String classLowerCase = detectedClass.toLowerCase(); // Convert to lowercase
+
+        if (classLowerCase.contains("plastic") || classLowerCase.contains("bottle")) {
+            return Color.YELLOW;
+        } else if (classLowerCase.contains("paper") || classLowerCase.contains("cardboard")) {
+            return Color.GREEN;
+        } else if (classLowerCase.contains("cans") || classLowerCase.contains("metal")) {
+            return Color.CYAN;
+        } else if (classLowerCase.contains("mouse") || classLowerCase.contains("television") ||
+                classLowerCase.contains("laptop") || classLowerCase.contains("keyboard")) {
+            return Color.BLUE;
+        } else {
+            return Color.RED; // Default color for unknown classes
         }
     }
 
-    private int getColorForClass(String detectedClass) {
-        switch (detectedClass) {
-            case "Plastic":
-                return Color.YELLOW;
-            case "Paper":
-                return Color.GREEN;
-            case "Cans":
-                return Color.CYAN;
-            default:
-                return Color.WHITE;
-        }
-    }
+
 
     private String encodeImage(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -397,24 +438,75 @@ public class ObjectDetection extends AppCompatActivity {
                 ? getResources().getColor(android.R.color.holo_green_dark)
                 : getResources().getColor(android.R.color.holo_red_dark));
 
+        if (isRecyclable(detectedClass)) {
+            statusTextView.setClickable(true);
+            statusTextView.setOnClickListener(v -> {
+                // Convert detectedClass to lowercase for case-insensitive comparison
+                String detectedClassLower = detectedClass.toLowerCase();
+
+                // Check if the detected class is related to Plastic or Bottle
+                if (detectedClassLower.contains("plastic") || detectedClassLower.contains("bottle")) {
+                    Intent intent = new Intent(ObjectDetection.this, Plastic.class);
+                    startActivity(intent);
+                }
+                // Check if the detected class is related to Paper or Cardboard
+                else if (detectedClassLower.contains("paper") || detectedClassLower.contains("cardboard")) {
+                    Intent intent = new Intent(ObjectDetection.this, Paper.class);
+                    startActivity(intent);
+                }
+                // Check if the detected class is related to Cans or Metal
+                else if (detectedClassLower.contains("cans") || detectedClassLower.contains("metal")) {
+                    Intent intent = new Intent(ObjectDetection.this, Cans.class);
+                    startActivity(intent);
+                }
+                // Check if the detected class is related to Electronics like Mouse, Television, Laptop, or Keyboard
+                else if (detectedClassLower.contains("mouse") || detectedClassLower.contains("television") ||
+                        detectedClassLower.contains("laptop") || detectedClassLower.contains("keyboard")) {
+                    Intent intent = new Intent(ObjectDetection.this, Electronic.class);
+                    startActivity(intent);
+                }
+                // If none of the above conditions are met, show a toast message
+                else {
+                    Toast.makeText(this, "Recyclable status clicked", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            // Make the status text non-clickable if not recyclable
+            statusTextView.setClickable(false);
+        }
+
         // Handle arrow click
         arrowView.setOnClickListener(v -> {
-            if(detectedClass.equals("Plastic")){
-                Intent intent=new Intent(ObjectDetection.this, Plastic.class);
+            // Convert detectedClass to lowercase for case-insensitive comparison
+            String detectedClassLower = detectedClass.toLowerCase();
+
+            // Check if the detected class is related to Plastic or Bottle
+            if (detectedClassLower.contains("plastic") || detectedClassLower.contains("bottle")) {
+                Intent intent = new Intent(ObjectDetection.this, Plastic.class);
                 startActivity(intent);
             }
-            else if(detectedClass.equals("Paper")){
-                Intent intent=new Intent(ObjectDetection.this, Paper.class);
+            // Check if the detected class is related to Paper or Cardboard
+            else if (detectedClassLower.contains("paper") || detectedClassLower.contains("cardboard")) {
+                Intent intent = new Intent(ObjectDetection.this, Paper.class);
                 startActivity(intent);
             }
-            else if(detectedClass.equals("Cans")){
-                Intent intent=new Intent(ObjectDetection.this, Cans.class);
+            // Check if the detected class is related to Cans or Metal
+            else if (detectedClassLower.contains("cans") || detectedClassLower.contains("metal")) {
+                Intent intent = new Intent(ObjectDetection.this, Cans.class);
                 startActivity(intent);
             }
-            else{
+            // Check if the detected class is related to Electronics like Mouse, Television, Laptop, or Keyboard
+            else if (detectedClassLower.contains("mouse") || detectedClassLower.contains("television") ||
+                    detectedClassLower.contains("laptop") || detectedClassLower.contains("keyboard")) {
+                Intent intent = new Intent(ObjectDetection.this, Electronic.class);
+                startActivity(intent);
+            }
+            // If none of the above conditions are met, show a toast message
+            else {
                 Toast.makeText(this, "Arrow clicked", Toast.LENGTH_SHORT).show();
             }
         });
+
 
         // Create the dialog
         AlertDialog dialog = builder.create();
@@ -440,9 +532,19 @@ public class ObjectDetection extends AppCompatActivity {
 
 
     private boolean isRecyclable(String itemClass) {
-        return itemClass.equalsIgnoreCase("Plastic") ||
-                itemClass.equalsIgnoreCase("Paper") ||
-                itemClass.equalsIgnoreCase("Cans");
+        // Convert to lowercase for case-insensitive comparison
+        String itemClassLower = itemClass.toLowerCase();
+
+        // Check if the item is recyclable based on the specified categories
+        return itemClassLower.contains("plastic") ||
+                itemClassLower.contains("paper") ||
+                itemClassLower.contains("cans") ||
+                itemClassLower.contains("cardboard") ||
+                itemClassLower.contains("metal") ||
+                itemClassLower.contains("mouse") ||
+                itemClassLower.contains("television") ||
+                itemClassLower.contains("laptop") ||
+                itemClassLower.contains("keyboard");
     }
 
     public void toFeedback(View view){
